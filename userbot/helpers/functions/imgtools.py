@@ -92,7 +92,7 @@ async def crop_and_divide(img):
             )
             mimg = mimg.resize((512, 512))
             image = io.BytesIO()
-            image.name = "CatUserbot.png"
+            image.name = "Userbot.png"
             mimg.save(image, "PNG")
             media.append(image.getvalue())
             new_width += scale_width
@@ -118,7 +118,6 @@ async def dotify(image, pix, mode):
         im_ = temp
     im = im_.convert("L")
     im_ = im if mode else im_
-    [_.thumbnail((pix, pix)) for _ in [im, im_]]
     w, h = im.size
     img = Image.new(im_.mode, (w * count + (count // 2), h * count + (count // 2)), 0)
     ImageDraw.Draw(img)
