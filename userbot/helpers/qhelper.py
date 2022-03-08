@@ -20,9 +20,9 @@ import urllib
 import emoji
 from fontTools.ttLib import TTFont
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-from telethon.tl import functions, types
+from telethon.tl import types
 
-from .utils import _catutils
+from .utils import _jmthonutils
 
 COLORS = [
     "#F07975",
@@ -91,14 +91,10 @@ async def process(msg, user, client, reply, replied=None):
                     width = mono.getsize(line)[0] + 30
                 else:
                     width = fallback.getsize(line)[0]
-            if maxlength < length:
-                maxlength = length
-
+            maxlength = max(maxlength, length)
     title = ""
     try:
-        details = await client(
-            functions.channels.GetParticipantRequest(reply.chat_id, user.id)
-        )
+        details = await client.get_permissions(reply.chat_id, user.id)
         if isinstance(details.participant, types.ChannelParticipantCreator):
             title = details.participant.rank if details.participant.rank else "Creator"
         elif isinstance(details.participant, types.ChannelParticipantAdmin):
@@ -165,7 +161,7 @@ async def process(msg, user, client, reply, replied=None):
                 cmd = (
                     f"lottie_convert.py --frame 0 -if lottie -of png {sticker} {file_1}"
                 )
-                stdout, stderr = (await _catutils.runcmd(cmd))[:2]
+                stdout, stderr = (await _jmthonutils.runcmd(cmd))[:2]
                 stimg = Image.open("./temp/q.png")
             else:
                 stimg = Image.open(sticker)
@@ -206,7 +202,7 @@ async def process(msg, user, client, reply, replied=None):
         file_1 = os.path.join("./temp/", "q.png")
         if sticker.endswith(("tgs")):
             cmd = f"lottie_convert.py --frame 0 -if lottie -of png {sticker} {file_1}"
-            stdout, stderr = (await _catutils.runcmd(cmd))[:2]
+            stdout, stderr = (await _jmthonutils.runcmd(cmd))[:2]
             stimg = Image.open("./temp/q.png")
         else:
             stimg = Image.open(sticker)
@@ -225,9 +221,9 @@ async def process(msg, user, client, reply, replied=None):
         elif reply.document.size < 1048576:
             docsize = str(round(reply.document.size / 1024, 2)) + " KB "
         elif reply.document.size < 1073741824:
-            docsize = str(round(reply.document.size / 1024 ** 2, 2)) + " MB "
+            docsize = str(round(reply.document.size / 1024**2, 2)) + " MB "
         else:
-            docsize = str(round(reply.document.size / 1024 ** 3, 2)) + " GB "
+            docsize = str(round(reply.document.size / 1024**3, 2)) + " GB "
         docbglen = (
             font.getsize(docsize)[0]
             if font.getsize(docsize)[0] > font.getsize(docname)[0]
@@ -239,7 +235,7 @@ async def process(msg, user, client, reply, replied=None):
         canvas.paste(top, (pfpbg.width, 0))
         canvas.paste(middle, (pfpbg.width, top.height))
         canvas.paste(bottom, (pfpbg.width, top.height + middle.height))
-        canvas = await catdoctype(docname, docsize, doctype, canvas)
+        canvas = await jmthondoctype(docname, docsize, doctype, canvas)
         y = 80 if text else 0
     else:
         canvas.paste(pfpbg, (0, 0))
@@ -370,7 +366,7 @@ async def get_entity(msg):
     return bold, mono, italic, link
 
 
-async def catdoctype(name, size, htype, canvas):
+async def jmthondoctype(name, size, htype, canvas):
     font = ImageFont.truetype("./temp/Roboto-Medium.ttf", 38)
     doc = Image.new("RGBA", (130, 130), (29, 29, 29, 255))
     draw = ImageDraw.Draw(doc)
