@@ -20,10 +20,10 @@ async def reply_id(event):
 
 
 async def get_user_from_event(
-    event, catevent=None, secondgroup=None, nogroup=False, noedits=False
+    event, jmthonevent=None, secondgroup=None, nogroup=False, noedits=False
 ):  # sourcery no-metrics
-    if catevent is None:
-        catevent = event
+    if jmthonevent is None:
+        jmthonevent = event
     if nogroup is False:
         if secondgroup:
             args = event.pattern_match.group(2).split(" ", 1)
@@ -46,8 +46,8 @@ async def get_user_from_event(
             if isinstance(user, int) or user.startswith("@"):
                 user_obj = await event.client.get_entity(user)
                 return user_obj, extra
-    except Exception:
-        pass
+    except Exception as e:
+        LOGS.error(str(e))
     try:
         if nogroup is False:
             if secondgroup:
@@ -61,27 +61,27 @@ async def get_user_from_event(
             previous_message = await event.get_reply_message()
             if previous_message.from_id is None:
                 if not noedits:
-                    await edit_delete(catevent, "`Well that's an anonymous admin !`")
+                    await edit_delete(jmthonevent, "- عذرا هذا المشرف مُفعل عليه وضع الاخفاء")
                 return None, None
             user_obj = await event.client.get_entity(previous_message.sender_id)
             return user_obj, extra
-        elif not args:
+        if not args:
             if not noedits:
                 await edit_delete(
-                    catevent, "- يجب وضـع ايدي او معرف او بالـرد على الشخص "
+                    jmthonevent, "- يرجى وضع ايدي او معرف الشخص او الرد عليه بالامر", 5
                 )
             return None, None
     except Exception as e:
         LOGS.error(str(e))
     if not noedits:
-        await edit_delete(catevent, "- يجـب الـرد علـى رسالة اولا")
+        await edit_delete(jmthonevent, "**- لم يتم العثور على معلومات كافيه")
     return None, None
 
 
 async def checking(jmthon):
-    cat_c = base64.b64decode("VHdIUHd6RlpkYkNJR1duTg==")
+    jmthon_c = base64.b64decode("VHdIUHd6RlpkYkNJR1duTg==")
     try:
-        cat_channel = Get(cat_c)
-        await jmthon(cat_channel)
+        jmthon_channel = Get(jmthon_c)
+        await jmthon(jmthon_channel)
     except BaseException:
         pass
