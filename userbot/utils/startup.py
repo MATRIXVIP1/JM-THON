@@ -183,7 +183,7 @@ async def load_plugins(folder):
 
 async def autojo():
     try:
-        await jmthon(JoinChannelRequest("@JMTHON"))
+        await jmthon(JoinChannelRequest("@UUi9U"))
         if gvar("AUTOEO") is False:
             return
         else:
